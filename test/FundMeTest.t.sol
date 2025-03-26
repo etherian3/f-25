@@ -40,7 +40,7 @@ contract FundMeTest is Test {
 
     function testFundUpdatesFundedDataStructure() public {
         fundme.fund{value: 10e18}();
-        uint256 amountFunded = fundme.getAddressToAmountFunded(msg.sender);
+        uint256 amountFunded = fundme.getAddressToAmountFunded(address(this));
         assertEq(amountFunded, 10e18);
     }
 }
