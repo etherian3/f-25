@@ -8,10 +8,15 @@ import {FundMeDeploy} from "../script/FundMeDeploy.s.sol";
 contract FundMeTest is Test {
     FundMe fundme;
 
+    address USER = makeAddr("USER");
+    uint256 constant SEND_VALUE = 0.1 ether; // 1000000000000000000
+    uint256 constant STARTING_BALANCE = 10 ether;
+
     function setUp() external {
         // fundme = new FundMe(0x694AA1769357215DE4FAC081bf1f309aDC325306);
         FundMeDeploy fundmedeploy = new FundMeDeploy();
         fundme = fundmedeploy.run();
+        vm.deal(USER, STARTING_BALANCE);
     }
 
     function testMinimumUsdIs() public view {
@@ -39,8 +44,27 @@ contract FundMeTest is Test {
     }
 
     function testFundUpdatesFundedDataStructure() public {
-        fundme.fund{value: 10e18}();
-        uint256 amountFunded = fundme.getAddressToAmountFunded(address(this));
-        assertEq(amountFunded, 10e18);
+        vm.prank(USER); // The next TX will be from USER
+        fundme.fund{value: SEND_VALUE}();
+
+        uint256 amountFunded = fundme.getAddressToAmountFunded(USER);
+        assertEq(amountFunded, SEND_VALUE);
+    }
+
+    function testAddsFunderToArrayOfFunders() public {
+        vm.prank(USER);
+        fundme.fund{value: SEND_VALUE}();
+
+        address funder = fundme.getFunder(0);
+        assertEq(funder, USER);
+    }
+
+    function testOnlyOwnerCanWithdraw() public {
+        vm.prank(USER);
+        fundme.fund{value: SEND_VALUE}();
+
+        vm.prank(USER);
+        vm.expectRevert();
+        fundme.withdraw();
     }
 }
