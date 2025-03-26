@@ -31,4 +31,16 @@ contract FundMeTest is Test {
             assertEq(version, 6);
         }
     }
+
+    function testFundFailsWithoutEnoughETH() public {
+        vm.expectRevert(); //hey, the next line, should revert!
+        // assert(This tx fails/reverts)
+        fundme.fund(); // send 0 value of eth
+    }
+
+    function testFundUpdatesFundedDataStructure() public {
+        fundme.fund{value: 10e18}();
+        uint256 amountFunded = fundme.getAddressToAmountFunded(msg.sender);
+        assertEq(amountFunded, 10e18);
+    }
 }
