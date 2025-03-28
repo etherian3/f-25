@@ -1,4 +1,5 @@
 {
   "solidity.defaultCompiler": "localNodeModule",
-  "postman.settings.dotenv-detection-notification-visibility": false
+  "postman.settings.dotenv-detection-notification-visibility": false,
+  "makefile.configureOnOpen": true
 }
